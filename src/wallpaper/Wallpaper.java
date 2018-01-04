@@ -9,33 +9,45 @@ package wallpaper;
  *
  * @author bowen
  */
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
 public class Wallpaper {
     
+    private static volatile long lastTickTimeNanos = System.nanoTime();
+        
     public static void main(String[] args) {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         
         
         JFrame frame = new JFrame("Bloc Active Wallpaper");
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setFocusable(true);
         frame.setUndecorated(true); //Remove top bar
         frame.setType(javax.swing.JFrame.Type.UTILITY); //Remove icon from taskbar
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
-        DisplayPanel panel = new DisplayPanel(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
+        //frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
+        //DisplayPanel panel = new DisplayPanel(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
+        //frame.setSize(300, 300);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        DisplayPanelSingleThread panel = new MovingBarST(executor, 60);
         
         frame.add(panel);
         
@@ -51,42 +63,45 @@ public class Wallpaper {
         frame.setVisible(true);
         frame.toBack();
         
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(new Runnable() {
+        int FPS = 60;
+        int UPS = 60;
+        
+        //panel.startTick();
+        panel.startRender();
+        
+        /*
+        executor.scheduleAtFixedRate(new Runnable() {
+            
             @Override
             public void run() {
-                /*
-                double milisFrameTime = 1000D / 60D;
-                double nextTime = System.currentTimeMillis() + milisFrameTime;
-                
-                long nanoInSecond = 1000000000l;
-                double nanosToSleep = nanoInSecond / 60D;
-                
-                long milis = (long)(nanosToSleep / 1000000);
-                int nanos = (int)(nanosToSleep % 1000000);*/
-                
-                while (true) {
-                    panel.tick();
-                    
-                    int FPS10 = 100;
-                    int FPS30 = 33;
-                    int FPS60 = 16;
-                    
-                    try {
-                        Thread.sleep(FPS60);
-                        //Thread.sleep(milis, nanos);
-                        //Thread.sleep((long)(1000D/60));
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Wallpaper.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                long currentNanos = System.nanoTime();
+                panel.tick(new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS));
+                lastTickTimeNanos = currentNanos;
             }
-        });
+        }, 0, TimeUnit.SECONDS.toNanos(1)/UPS, TimeUnit.NANOSECONDS);
+        
+        executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                panel.update(new PreciseTime(System.nanoTime() - lastTickTimeNanos, TimeUnit.NANOSECONDS));
+            }
+        }, TimeUnit.SECONDS.toNanos(1)/(UPS * 2), TimeUnit.SECONDS.toNanos(1)/FPS, TimeUnit.NANOSECONDS);
+        */
+        
+        boolean isFlip = false;
         
         while (true) {
             frame.toBack();
+            /*
+            isFlip = !isFlip;
+            if (isFlip) {
+                panel.setFPS(30);
+            } else {
+                panel.setFPS(60);
+            }*/
+            
             try {
-                Thread.sleep(1000);
+                Thread.sleep(300);
             } catch (InterruptedException ex) {
                 
             }
