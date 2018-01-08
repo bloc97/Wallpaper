@@ -9,6 +9,7 @@ package wallpaper;
  *
  * @author bowen
  */
+import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
@@ -38,70 +39,59 @@ public class Wallpaper {
         
         
         JFrame frame = new JFrame("Bloc Active Wallpaper");
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setFocusable(true);
         frame.setUndecorated(true); //Remove top bar
         frame.setType(javax.swing.JFrame.Type.UTILITY); //Remove icon from taskbar
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
+        frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height - 40);
         //DisplayPanel panel = new DisplayPanel(toolkit.getScreenSize().width, toolkit.getScreenSize().height);
         //frame.setSize(300, 300);
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
-        DisplayPanelSingleThread panel = new MovingBarST(executor, 60);
+        //ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        DisplayPanelSingleThread panel = new TriggerSquaresSpikeDiagonalSpreadChance(executor, 60);
         
         frame.add(panel);
         
-        //frame.setFocusable(false);
+        frame.setFocusable(true);
         frame.setFocusableWindowState(false);
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowActivated(WindowEvent e) {
+                super.windowActivated(e);
                 frame.toBack();
             }
+
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                super.windowStateChanged(e); //To change body of generated methods, choose Tools | Templates.
+                frame.toBack();
+            }
+            
+        });
+        
+        frame.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                super.focusGained(e); //To change body of generated methods, choose Tools | Templates.
+                frame.toBack();
+            }
+            
         });
         
         frame.setVisible(true);
-        frame.toBack();
         
-        int FPS = 60;
-        int UPS = 60;
         
         //panel.startTick();
         panel.startRender();
         
-        /*
-        executor.scheduleAtFixedRate(new Runnable() {
-            
-            @Override
-            public void run() {
-                long currentNanos = System.nanoTime();
-                panel.tick(new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS));
-                lastTickTimeNanos = currentNanos;
-            }
-        }, 0, TimeUnit.SECONDS.toNanos(1)/UPS, TimeUnit.NANOSECONDS);
+        frame.toBack();
         
-        executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                panel.update(new PreciseTime(System.nanoTime() - lastTickTimeNanos, TimeUnit.NANOSECONDS));
-            }
-        }, TimeUnit.SECONDS.toNanos(1)/(UPS * 2), TimeUnit.SECONDS.toNanos(1)/FPS, TimeUnit.NANOSECONDS);
-        */
-        
-        boolean isFlip = false;
-        
-        while (true) {
+        for (int i=0; i<4; i++) {
             frame.toBack();
-            /*
-            isFlip = !isFlip;
-            if (isFlip) {
-                panel.setFPS(30);
-            } else {
-                panel.setFPS(60);
-            }*/
             
             try {
-                Thread.sleep(300);
+                Thread.sleep(500);
             } catch (InterruptedException ex) {
                 
             }

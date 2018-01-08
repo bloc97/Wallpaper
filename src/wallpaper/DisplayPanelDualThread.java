@@ -5,7 +5,6 @@
  */
 package wallpaper;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.concurrent.ScheduledExecutorService;
@@ -70,7 +69,7 @@ public abstract class DisplayPanelDualThread extends JPanel {
             updateFuture = executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    update(new PreciseTime(System.nanoTime() - lastTickTimeNanos, TimeUnit.NANOSECONDS));
+                    update();
                 }
             }, TimeUnit.SECONDS.toNanos(1)/(500), TimeUnit.SECONDS.toNanos(1)/fps, TimeUnit.NANOSECONDS);
             return true;
@@ -142,14 +141,15 @@ public abstract class DisplayPanelDualThread extends JPanel {
     
     public abstract void onTick(PreciseTime dt);
     
-    private final void update(PreciseTime dtSinceLastTick) {
+    public final void update() {
+        PreciseTime dtSinceLastTick = new PreciseTime(System.nanoTime() - lastTickTimeNanos, TimeUnit.NANOSECONDS);
         //repaint();
         prePaint(dtSinceLastTick);
         Graphics g = getGraphics();
         if (g != null) {
             onPaint(g, dtSinceLastTick);
-            g.dispose();
             Toolkit.getDefaultToolkit().sync();
+            g.dispose();
         }
         postPaint(dtSinceLastTick);
     }

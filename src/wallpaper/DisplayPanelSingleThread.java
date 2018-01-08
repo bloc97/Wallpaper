@@ -5,7 +5,6 @@
  */
 package wallpaper;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.concurrent.ScheduledExecutorService;
@@ -57,11 +56,9 @@ public abstract class DisplayPanelSingleThread extends JPanel {
             updateFuture = executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    long currentNanos = System.nanoTime();
-                    update(new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS));
-                    lastTickTimeNanos = currentNanos;
+                    update();
                 }
-            }, TimeUnit.SECONDS.toNanos(1)/(500), TimeUnit.SECONDS.toNanos(1)/fps, TimeUnit.NANOSECONDS);
+            }, 0, TimeUnit.SECONDS.toNanos(1)/fps, TimeUnit.NANOSECONDS);
             return true;
         }
         return false;
@@ -90,21 +87,26 @@ public abstract class DisplayPanelSingleThread extends JPanel {
         return fps;
     }
     
-    public final void update(PreciseTime dt) {
-        //repaint();
+    public final void update() {
+        long currentNanos = System.nanoTime();
+        PreciseTime dt = new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS);
+        currentdt = dt;
+        lastTickTimeNanos = currentNanos;
         prePaint(dt);
-        Graphics g = getGraphics();
-        if (g != null) {
-            onPaint(g, dt);
-            g.dispose();
-            Toolkit.getDefaultToolkit().sync();
-        }
+        repaint();
         postPaint(dt);
+    }
+
+    private PreciseTime currentdt;
+    
+    @Override
+    protected void paintComponent(Graphics g) {
+        //super.paintComponent(g);
+        onPaint(g, currentdt);
     }
     
     public abstract void prePaint(PreciseTime dt);
     public abstract void onPaint(Graphics g, PreciseTime dt);
     public abstract void postPaint(PreciseTime dt);
-    
     
 }
