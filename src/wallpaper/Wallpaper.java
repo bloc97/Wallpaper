@@ -49,7 +49,7 @@ public class Wallpaper {
         //frame.setSize(300, 300);
         //ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        DisplayPanelSingleThread panel = new TriggerSquaresSpikeDiagonalSpreadChance(executor, 60);
+        DisplayPanelSingleThread panel = new DesktopIcons(executor, 60);
         
         frame.add(panel);
         
