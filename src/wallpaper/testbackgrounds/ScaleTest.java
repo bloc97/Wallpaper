@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.testbackgrounds;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,8 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.DisplayPanelSingleThread;
+import wallpaper.PreciseTime;
 
 /**
  *

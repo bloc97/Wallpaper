@@ -3,28 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.testbackgrounds;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.DisplayPanelSingleThread;
+import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class TriggerSquaresSpikeDiagonalSpreadChance extends DisplayPanelSingleThread {
-    private int xSize = 192;
-    private int ySize = 108 - 3;
+public class TriggerSquaresSpikeSkipAndDiagonals extends DisplayPanelSingleThread {
+    private int xSize = 300;
+    private int ySize = 120;
     private int[][] board = new int[xSize][ySize];
     private int[][] distanceBoard = new int[xSize][ySize];
     private boolean[][] activeBoard = new boolean[xSize][ySize];
     
     private Random random = new Random(245);
     
-    public TriggerSquaresSpikeDiagonalSpreadChance(ScheduledExecutorService executorService, int fps) {
+    public TriggerSquaresSpikeSkipAndDiagonals(ScheduledExecutorService executorService, int fps) {
         super(executorService, fps);
     }
     
@@ -33,7 +35,7 @@ public class TriggerSquaresSpikeDiagonalSpreadChance extends DisplayPanelSingleT
         if (random.nextInt(10) < 2) {
             int rx = random.nextInt(xSize);
             int ry = random.nextInt(ySize);
-            int rd = random.nextInt(100);
+            int rd = (int)Math.abs(random.nextGaussian() * 50);
             board[rx][ry] = 255;
             activeBoard[rx][ry] = true;
             distanceBoard[rx][ry] = rd;
@@ -45,36 +47,44 @@ public class TriggerSquaresSpikeDiagonalSpreadChance extends DisplayPanelSingleT
                     try {
                         int ii = i;
                         int jj = j;
-                        switch (random.nextInt(4)) {
+                        switch (random.nextInt(8)) {
                                 
                             case 0:
+                                ii += 2;
+                                break;
+                            case 1:
+                                jj -= 2;
+                                break;
+                            case 2:
+                                jj += 2;
+                                break;
+                            case 3:
+                                ii -= 2;
+                                break;
+                            case 4:
                                 ii += 1;
                                 jj += 1;
                                 break;
-                            case 1:
+                            case 5:
                                 ii += 1;
                                 jj -= 1;
                                 break;
-                            case 2:
+                            case 6:
                                 ii -= 1;
                                 jj += 1;
                                 break;
-                            case 3:
+                            case 7:
                                 ii -= 1;
                                 jj -= 1;
                                 break;
                         }
 
                         if (!activeBoard[ii][jj]) {
-                            //if (random.nextInt(5) == 0) {
+                            //if (random.nextInt(2) == 0) {
                                 board[ii][jj] = 255;//Math.min((int)((board[i][j] + board[ii][jj]) / 0.01D), 255);
                                 activeBoard[ii][jj] = true;
                                 distanceBoard[ii][jj] = distanceBoard[i][j] - 1;
-                                if (random.nextInt(10) != 0) {
-                                    distanceBoard[i][j] = 0;
-                                } else {
-                                    distanceBoard[i][j] = Math.min(distanceBoard[i][j], 3);
-                                }
+                                distanceBoard[i][j] = 0;
                             //}
                         }
 

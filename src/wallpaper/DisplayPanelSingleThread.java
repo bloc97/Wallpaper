@@ -26,6 +26,7 @@ public abstract class DisplayPanelSingleThread extends JPanel {
     private int fps;
     
     public DisplayPanelSingleThread(ScheduledExecutorService executorService, int fps) {
+        this.setOpaque(false);
         this.executorService = executorService;
         this.lastTickTimeNanos = System.nanoTime();
         this.fps = fps;
@@ -93,7 +94,9 @@ public abstract class DisplayPanelSingleThread extends JPanel {
         currentdt = dt;
         lastTickTimeNanos = currentNanos;
         prePaint(dt);
-        repaint();
+        if (requestPaint) {
+            repaint();
+        }
         postPaint(dt);
     }
 

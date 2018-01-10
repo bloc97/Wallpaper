@@ -3,40 +3,51 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.testbackgrounds;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.DisplayPanelSingleThread;
+import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class TriggerSquaresSoft extends DisplayPanelSingleThread {
+public class TriggerSquaresSpike extends DisplayPanelSingleThread {
     private int xSize = 300;
     private int ySize = 120;
     private int[][] board = new int[xSize][ySize];
+    private int[][] distanceBoard = new int[xSize][ySize];
+    private boolean[][] activeBoard = new boolean[xSize][ySize];
     
     private Random random = new Random(245);
     
-    public TriggerSquaresSoft(ScheduledExecutorService executorService, int fps) {
+    public TriggerSquaresSpike(ScheduledExecutorService executorService, int fps) {
         super(executorService, fps);
     }
     
     @Override
     public void prePaint(PreciseTime dt) {
-        board[random.nextInt(xSize)][random.nextInt(ySize)] = 255;
+        if (random.nextInt(10) < 2) {
+            int rx = random.nextInt(xSize);
+            int ry = random.nextInt(ySize);
+            int rd = random.nextInt(100);
+            board[rx][ry] = 255;
+            activeBoard[rx][ry] = true;
+            distanceBoard[rx][ry] = rd;
+        }
         
         for (int i=0; i<xSize; i++) {
             for (int j=0; j<ySize; j++) {
-                if (random.nextInt(10) > 7) {
+                if (distanceBoard[i][j] > 0) {
                     try {
                         int ii = i;
                         int jj = j;
-                        switch (random.nextInt(4)) {
+                        switch (random.nextInt(8)) {
                             case 0:
                                 ii += 1;
                                 break;
@@ -49,10 +60,32 @@ public class TriggerSquaresSoft extends DisplayPanelSingleThread {
                             case 3:
                                 jj -=1;
                                 break;
+                                
+                            case 4:
+                                ii += 1;
+                                jj += 1;
+                                break;
+                            case 5:
+                                ii += 1;
+                                jj -= 1;
+                                break;
+                            case 6:
+                                ii -= 1;
+                                jj += 1;
+                                break;
+                            case 7:
+                                ii -= 1;
+                                jj -= 1;
+                                break;
                         }
 
-                        if (board[ii][jj] >= board[i][j]) {
-                            board[i][j] = Math.min((int)((board[i][j] + board[ii][jj]) / 2.2D), 255);
+                        if (!activeBoard[ii][jj]) {
+                            //if (random.nextInt(5) == 0) {
+                                board[ii][jj] = 255;//Math.min((int)((board[i][j] + board[ii][jj]) / 0.01D), 255);
+                                activeBoard[ii][jj] = true;
+                                distanceBoard[ii][jj] = distanceBoard[i][j] - 1;
+                                distanceBoard[i][j] = 0;
+                            //}
                         }
 
                     } catch (Exception ex) {
@@ -67,6 +100,9 @@ public class TriggerSquaresSoft extends DisplayPanelSingleThread {
                 double slope = 1D/board[i][j];
                 if (slope > 0) {
                     board[i][j] = Math.max((int)(board[i][j] - slope), 0);
+                }
+                if (board[i][j] == 0) {
+                    activeBoard[i][j] = false;
                 }
             }
         }

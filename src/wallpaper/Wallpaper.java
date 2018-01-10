@@ -9,6 +9,8 @@ package wallpaper;
  *
  * @author bowen
  */
+import java.awt.Color;
+import wallpaper.icons.DesktopIcons;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
@@ -28,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
+import wallpaper.testbackgrounds.MovingBarST;
 
 public class Wallpaper {
     
@@ -49,9 +52,10 @@ public class Wallpaper {
         //frame.setSize(300, 300);
         //ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        DisplayPanelSingleThread panel = new DesktopIcons(executor, 60);
-        
+        DisplayPanelSingleThread backPanel = new MovingBarST(executor, 30);
+        DesktopIcons panel = new DesktopIcons(executor, 60);
         frame.add(panel);
+        panel.setBackground(backPanel);
         
         frame.setFocusable(true);
         frame.setFocusableWindowState(false);
@@ -79,10 +83,10 @@ public class Wallpaper {
             
         });
         
+        frame.validate();
         frame.setVisible(true);
         
         
-        //panel.startTick();
         panel.startRender();
         
         frame.toBack();

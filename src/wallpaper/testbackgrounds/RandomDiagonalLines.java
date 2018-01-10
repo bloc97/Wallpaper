@@ -3,40 +3,44 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.testbackgrounds;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.DisplayPanelSingleThread;
+import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class TriggerSquaresSpikeSkipAndDiagonals extends DisplayPanelSingleThread {
-    private int xSize = 300;
-    private int ySize = 120;
+public class RandomDiagonalLines extends DisplayPanelSingleThread {
+    private int xSize = 192;
+    private int ySize = 108 - 3;
     private int[][] board = new int[xSize][ySize];
     private int[][] distanceBoard = new int[xSize][ySize];
     private boolean[][] activeBoard = new boolean[xSize][ySize];
     
     private Random random = new Random(245);
     
-    public TriggerSquaresSpikeSkipAndDiagonals(ScheduledExecutorService executorService, int fps) {
+    public RandomDiagonalLines(ScheduledExecutorService executorService, int fps) {
         super(executorService, fps);
     }
+    
     
     @Override
     public void prePaint(PreciseTime dt) {
         if (random.nextInt(10) < 2) {
-            int rx = random.nextInt(xSize);
-            int ry = random.nextInt(ySize);
-            int rd = (int)Math.abs(random.nextGaussian() * 50);
-            board[rx][ry] = 255;
-            activeBoard[rx][ry] = true;
-            distanceBoard[rx][ry] = rd;
+            int rx = random.nextInt(xSize/8)*8;
+            int ry = random.nextInt(ySize/8)*8;
+            int rd = (int)Math.abs(random.nextGaussian() * 10 + 30);
+            if (!activeBoard[rx][ry]) {
+                board[rx][ry] = 255;
+                activeBoard[rx][ry] = true;
+                distanceBoard[rx][ry] = rd;
+            }
         }
         
         for (int i=0; i<xSize; i++) {
@@ -45,45 +49,18 @@ public class TriggerSquaresSpikeSkipAndDiagonals extends DisplayPanelSingleThrea
                     try {
                         int ii = i;
                         int jj = j;
-                        switch (random.nextInt(8)) {
-                                
-                            case 0:
-                                ii += 2;
-                                break;
-                            case 1:
-                                jj -= 2;
-                                break;
-                            case 2:
-                                jj += 2;
-                                break;
-                            case 3:
-                                ii -= 2;
-                                break;
-                            case 4:
-                                ii += 1;
-                                jj += 1;
-                                break;
-                            case 5:
-                                ii += 1;
-                                jj -= 1;
-                                break;
-                            case 6:
-                                ii -= 1;
-                                jj += 1;
-                                break;
-                            case 7:
-                                ii -= 1;
-                                jj -= 1;
-                                break;
-                        }
+                        ii += 1;
+                        jj += 1;
+                        ii %= xSize;
+                        jj %= ySize;
 
                         if (!activeBoard[ii][jj]) {
-                            //if (random.nextInt(2) == 0) {
+                            if (random.nextInt(3) == 0) {
                                 board[ii][jj] = 255;//Math.min((int)((board[i][j] + board[ii][jj]) / 0.01D), 255);
                                 activeBoard[ii][jj] = true;
                                 distanceBoard[ii][jj] = distanceBoard[i][j] - 1;
                                 distanceBoard[i][j] = 0;
-                            //}
+                            }
                         }
 
                     } catch (Exception ex) {
@@ -109,7 +86,7 @@ public class TriggerSquaresSpikeSkipAndDiagonals extends DisplayPanelSingleThrea
 
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        g.clearRect(0, 0, getWidth(), getHeight());
+        //g.clearRect(0, 0, getWidth(), getHeight());
         //g.drawRect(5, 5, 100, 100);
         //g.setColor(Color.BLACK);
         for (int i=0; i<xSize; i++) {
@@ -123,5 +100,4 @@ public class TriggerSquaresSpikeSkipAndDiagonals extends DisplayPanelSingleThrea
     @Override
     public void postPaint(PreciseTime dt) {
     }
-    
 }

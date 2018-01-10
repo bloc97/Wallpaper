@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.testbackgrounds;
 
 import java.awt.Graphics;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.DisplayPanelSingleThread;
+import wallpaper.PreciseTime;
 
 /**
  *
