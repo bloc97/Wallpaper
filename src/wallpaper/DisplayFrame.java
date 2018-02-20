@@ -16,7 +16,7 @@ import javax.swing.JPanel;
  *
  * @author bowen
  */
-public abstract class DisplayPanelSingleThread extends JPanel {
+public abstract class DisplayFrame extends JPanel {
     
     private ScheduledFuture updateFuture;
     
@@ -25,7 +25,7 @@ public abstract class DisplayPanelSingleThread extends JPanel {
     private volatile long lastTickTimeNanos;
     private int fps;
     
-    public DisplayPanelSingleThread(ScheduledExecutorService executorService, int fps) {
+    public DisplayFrame(ScheduledExecutorService executorService, int fps) {
         this.setOpaque(false);
         this.executorService = executorService;
         this.lastTickTimeNanos = System.nanoTime();
@@ -94,7 +94,9 @@ public abstract class DisplayPanelSingleThread extends JPanel {
         currentdt = dt;
         lastTickTimeNanos = currentNanos;
         prePaint(dt);
-        repaint();
+        if (requestPaint) {
+            repaint();
+        }
         postPaint(dt);
     }
 

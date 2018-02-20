@@ -5,43 +5,57 @@
  */
 package wallpaper;
 
-import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import javax.swing.JPanel;
 
 /**
  *
  * @author bowen
  */
-public abstract class DisplayPanelSingleThread extends JPanel {
+public class SingleThreadWorker implements Worker {
+    
+    private final Wallpaper wallpaper;
     
     private ScheduledFuture updateFuture;
-    
     private ScheduledExecutorService executorService;
+    private int targetFPS;
     
-    private volatile long lastTickTimeNanos;
-    private int fps;
-    
-    public DisplayPanelSingleThread(ScheduledExecutorService executorService, int fps) {
-        this.setOpaque(false);
+    public SingleThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetFPS) {
+        this.wallpaper = wallpaper;
         this.executorService = executorService;
-        this.lastTickTimeNanos = System.nanoTime();
-        this.fps = fps;
+        this.targetFPS = targetFPS;
     }
-
+    
+    @Override
     public ScheduledExecutorService getExecutorService() {
         return executorService;
     }
 
-    public void setExecutorService(ScheduledExecutorService executorService) {
+    @Override
+    public boolean setExecutorService(ScheduledExecutorService executorService) {
         this.executorService = executorService;
+        boolean isSuccessful = true;
         if (isRenderRunning()) {
-            stopRender();
-            startRender();
+            isSuccessful &= stopRender();
+            isSuccessful &= startRender();
         }
+        return isSuccessful;
+    }
+
+    @Override
+    public boolean start() {
+        return startRender();
+    }
+
+    @Override
+    public boolean stop() {
+        return stopRender();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRenderRunning();
     }
     
     public boolean isRenderRunning() {
@@ -53,13 +67,13 @@ public abstract class DisplayPanelSingleThread extends JPanel {
     
     public boolean startRender() {
         if (!isRenderRunning()) {
-            this.lastTickTimeNanos = System.nanoTime();
             updateFuture = executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    update();
+                    wallpaper.mainTick();
+                    wallpaper.paintTick();
                 }
-            }, 0, TimeUnit.SECONDS.toNanos(1)/fps, TimeUnit.NANOSECONDS);
+            }, 0, TimeUnit.SECONDS.toNanos(1)/targetFPS, TimeUnit.NANOSECONDS);
             return true;
         }
         return false;
@@ -75,8 +89,8 @@ public abstract class DisplayPanelSingleThread extends JPanel {
         return false;
     }
 
-    public boolean setFPS(int fps) {
-        this.fps = fps;
+    public boolean setTargetFPS(int fps) {
+        targetFPS = fps;
         if (isRenderRunning()) {
             stopRender();
             return startRender();
@@ -84,30 +98,9 @@ public abstract class DisplayPanelSingleThread extends JPanel {
         return true;
     }
 
-    public int getFPS() {
-        return fps;
+    public int getTargetFPS() {
+        return targetFPS;
     }
     
-    public final void update() {
-        long currentNanos = System.nanoTime();
-        PreciseTime dt = new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS);
-        currentdt = dt;
-        lastTickTimeNanos = currentNanos;
-        prePaint(dt);
-        repaint();
-        postPaint(dt);
-    }
-
-    private PreciseTime currentdt;
-    
-    @Override
-    protected void paintComponent(Graphics g) {
-        //super.paintComponent(g);
-        onPaint(g, currentdt);
-    }
-    
-    public abstract void prePaint(PreciseTime dt);
-    public abstract void onPaint(Graphics g, PreciseTime dt);
-    public abstract void postPaint(PreciseTime dt);
     
 }

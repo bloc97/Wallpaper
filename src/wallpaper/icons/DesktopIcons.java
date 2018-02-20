@@ -39,17 +39,26 @@ public class DesktopIcons extends DisplayPanelSingleThread {
         super(executorService, fps);
         this.setOpaque(false);
         //this.setBackground(new Color(0x00000000, true));
+        int xc = 0;
         int yc = 0;
         
         File[] publicDesktopFiles = fs.getDefaultDirectory().getParentFile().getParentFile().listFiles((File pathname) -> pathname.getName().equals("Public"))[0].listFiles((File pathname) -> pathname.getName().equals("Desktop"))[0].listFiles();
         for (File file : publicDesktopFiles) {
-            DesktopIcon icon = new DesktopIcon(new Point(10, 10 + yc), file); 
+            if (yc >= 1080) {
+                yc = 0;
+                xc += 32 + 8;
+            }
+            DesktopIcon icon = new DesktopIcon(new Point(10 + xc, 10 + yc), file); 
             icons.add(icon);
             yc += 32 + 8;
         }
         File[] desktopFiles = fs.getHomeDirectory().listFiles((File pathname) -> !pathname.getName().startsWith("::"));
         for (File file : desktopFiles) {
-            DesktopIcon icon = new DesktopIcon(new Point(10, 10 + yc), file); 
+            if (yc >= 1080) {
+                yc = 0;
+                xc += 32 + 8;
+            }
+            DesktopIcon icon = new DesktopIcon(new Point(10 + xc, 10 + yc), file); 
             icons.add(icon);
             yc += 32 + 8;
         }
@@ -68,7 +77,6 @@ public class DesktopIcons extends DisplayPanelSingleThread {
 
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        return;
         g.clearRect(0, 0, getWidth(), getHeight());
         if (background != null) {
             background.onPaint(g, dt);
