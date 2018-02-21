@@ -26,22 +26,22 @@ public class Main {
         Background background = new Background("Bloc Active Wallpaper", false);
         
         
-        //ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
         
         //CustomWallpaper icons = new DesktopIcons();
         //Worker worker = new SingleThreadWorker(icons, executor, 60);
         
-        //CustomWallpaper movingBar = new MovingBar();
-        //Worker wallpaperWorker = new SingleThreadWorker(movingBar, executor, 30);
+        CustomWallpaper movingBar = new MovingBar();
+        Worker wallpaperWorker = new SingleThreadWorker(movingBar, executor, 30);
         
-        VideoWallpaper video = new VideoWallpaper("test.mp4");
+        VideoWallpaper video = new VideoWallpaper("https://youtu.be/xisVS_DKpJg?t=2h58m49s");
         
         background.setBackground(video);
-        video.start();
-        //background.setForeground(movingBar);
+        background.setForeground(movingBar);
         
         //worker.start();
-        //wallpaperWorker.start();
+        wallpaperWorker.start();
+        video.start();
         
     }
 }

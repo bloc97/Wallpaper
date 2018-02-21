@@ -6,13 +6,9 @@
 package wallpaper;
 
 import java.awt.Component;
-import java.awt.image.BufferedImage;
-import javax.sound.sampled.SourceDataLine;
 import uk.co.caprica.vlcj.component.EmbeddedMediaListPlayerComponent;
 import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.player.MediaPlayerEventAdapter;
 
 /**
  *
@@ -38,6 +34,8 @@ public class VideoWallpaper implements Wallpaper {
     public void start() {
         mediaPlayerComponent.getMediaPlayer().setRepeat(true);
         mediaPlayerComponent.getMediaPlayer().playMedia(video);
+        mediaPlayerComponent.getMediaPlayer().mute();
+        mediaPlayerComponent.getMediaPlayer().setPlaySubItems(true);
     }
     
     @Override
