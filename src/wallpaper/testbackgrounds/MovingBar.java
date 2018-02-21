@@ -20,7 +20,7 @@ public class MovingBar extends CustomWallpaper {
     private double x = 0;
 
     public MovingBar() {
-        getPanel().setBackground(Color.WHITE);
+        getComponent().setBackground(Color.WHITE);
     }
     
     

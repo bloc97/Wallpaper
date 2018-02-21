@@ -5,6 +5,7 @@
  */
 package wallpaper;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 
@@ -14,6 +15,6 @@ import javax.swing.JPanel;
  */
 public interface Wallpaper {
     
-    public JPanel getPanel();
+    public Component getComponent();
     
 }

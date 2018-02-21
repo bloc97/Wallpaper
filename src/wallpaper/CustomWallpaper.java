@@ -5,6 +5,7 @@
  */
 package wallpaper;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JPanel;
@@ -47,6 +48,10 @@ public abstract class CustomWallpaper implements Wallpaper {
     public abstract void postPaint(PreciseTime dt);
     
     @Override
+    public Component getComponent() {
+        return panel;
+    }
+    
     public JPanel getPanel() {
         return panel;
     }

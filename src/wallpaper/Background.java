@@ -95,17 +95,17 @@ public class Background {
     }
     
     public void setForeground(Wallpaper wallpaper) {
-        frame.setGlassPane(wallpaper.getPanel());
-        wallpaper.getPanel().setVisible(true);
+        frame.setGlassPane(wallpaper.getComponent());
+        wallpaper.getComponent().setVisible(true);
     }
     
     public void setBackground(Wallpaper wallpaper) {
         if (lastComponent != null) {
             frame.remove(lastComponent);
         }
-        frame.add(wallpaper.getPanel());
+        frame.add(wallpaper.getComponent());
         frame.validate();
-        lastComponent = wallpaper.getPanel();
+        lastComponent = wallpaper.getComponent();
     }
     
 }

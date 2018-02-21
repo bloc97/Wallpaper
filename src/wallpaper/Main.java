@@ -34,9 +34,10 @@ public class Main {
         //CustomWallpaper movingBar = new MovingBar();
         //Worker wallpaperWorker = new SingleThreadWorker(movingBar, executor, 30);
         
-        Wallpaper video = new VideoWallpaper("test.mp4");
+        VideoWallpaper video = new VideoWallpaper("test.mp4");
         
         background.setBackground(video);
+        video.start();
         //background.setForeground(movingBar);
         
         //worker.start();
