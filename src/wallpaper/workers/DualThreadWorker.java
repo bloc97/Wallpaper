@@ -8,7 +8,7 @@ package wallpaper.workers;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import wallpaper.Wallpaper;
+import wallpaper.CustomWallpaper;
 
 /**
  *
@@ -16,7 +16,7 @@ import wallpaper.Wallpaper;
  */
 public class DualThreadWorker implements Worker {
     
-    private final Wallpaper wallpaper;
+    private final CustomWallpaper wallpaper;
     
     private ScheduledFuture tickFuture;
     private ScheduledFuture updateFuture;
@@ -24,7 +24,7 @@ public class DualThreadWorker implements Worker {
     private int targetUPS;
     private int targetFPS;
     
-    public DualThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetUPS, int targetFPS) {
+    public DualThreadWorker(CustomWallpaper wallpaper, ScheduledExecutorService executorService, int targetUPS, int targetFPS) {
         this.wallpaper = wallpaper;
         this.executorService = executorService;
         this.targetUPS = targetUPS;

@@ -16,24 +16,31 @@ import java.awt.Color;
 import wallpaper.icons.DesktopIcons;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import wallpaper.testbackgrounds.MovingBar;
 
 public class Main {
     
         
     public static void main(String[] args) {
         
+        Background background = new Background("Bloc Active Wallpaper", false);
         
-        Background background = new Background("Bloc Active Wallpaper", true);
         
+        //ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
         
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        //CustomWallpaper icons = new DesktopIcons();
+        //Worker worker = new SingleThreadWorker(icons, executor, 60);
         
-        Wallpaper wallpaper = new DesktopIcons();
-        Worker worker = new SingleThreadWorker(wallpaper, executor, 30);
+        //CustomWallpaper movingBar = new MovingBar();
+        //Worker wallpaperWorker = new SingleThreadWorker(movingBar, executor, 30);
         
-        background.setForeground(wallpaper);
-        worker.start();
+        Wallpaper video = new VideoWallpaper("test.mp4");
         
+        background.setBackground(video);
+        //background.setForeground(movingBar);
+        
+        //worker.start();
+        //wallpaperWorker.start();
         
     }
 }

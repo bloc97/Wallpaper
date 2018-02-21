@@ -6,6 +6,7 @@
 package wallpaper;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.FocusAdapter;
@@ -24,7 +25,11 @@ import javax.swing.WindowConstants;
  */
 public class Background {
     
+    public static final int MAXIMIZE_OFFSET = 1;
+    
     protected final JFrame frame;
+    
+    private Component lastComponent = null;
 
     public Background(String name, boolean isTransparent) {
         
@@ -38,7 +43,9 @@ public class Background {
         frame.setUndecorated(true); //Remove top bar
         frame.setType(javax.swing.JFrame.Type.UTILITY); //Remove icon from taskbar
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //Exit app on close
-        frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height);// - 40); //Size minus taskbar
+        
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(toolkit.getScreenSize().width, toolkit.getScreenSize().height - MAXIMIZE_OFFSET); //Size minus taskbar
         
         frame.addWindowListener(new WindowAdapter() { //Send to back just in case
             @Override
@@ -62,6 +69,7 @@ public class Background {
         });
         
         if (isTransparent) {
+            //frame.getContentPane().setBackground(new Color(0, 0, 0, 0));
             frame.setBackground(new Color(0, 0, 0, 0));
         }
         
@@ -73,27 +81,31 @@ public class Background {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         
         executor.schedule(() -> {
-                for (int i=0; i<4; i++) {
-                    frame.toBack();
+            for (int i=0; i<4; i++) {
+                frame.toBack();
 
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ex) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
 
-                    }
                 }
+            }
         }, 0, TimeUnit.MILLISECONDS);
         
     }
     
     public void setForeground(Wallpaper wallpaper) {
-        frame.setGlassPane(wallpaper.panel);
-        wallpaper.panel.setVisible(true);
+        frame.setGlassPane(wallpaper.getPanel());
+        wallpaper.getPanel().setVisible(true);
     }
     
     public void setBackground(Wallpaper wallpaper) {
-        frame.removeAll();
-        frame.add(wallpaper.panel);
+        if (lastComponent != null) {
+            frame.remove(lastComponent);
+        }
+        frame.add(wallpaper.getPanel());
+        frame.validate();
+        lastComponent = wallpaper.getPanel();
     }
     
 }

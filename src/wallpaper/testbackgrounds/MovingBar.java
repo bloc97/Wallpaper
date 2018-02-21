@@ -5,22 +5,24 @@
  */
 package wallpaper.testbackgrounds;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.concurrent.ScheduledExecutorService;
-import wallpaper.DisplayPanelSingleThread;
 import wallpaper.PreciseTime;
+import wallpaper.CustomWallpaper;
 
 /**
  *
  * @author bowen
  */
-public class MovingBarST extends DisplayPanelSingleThread {
+public class MovingBar extends CustomWallpaper {
 
     private double x = 0;
 
-    public MovingBarST(ScheduledExecutorService executorService, int fps) {
-        super(executorService, fps);
+    public MovingBar() {
+        getPanel().setBackground(Color.WHITE);
     }
+    
     
     @Override
     public void prePaint(PreciseTime dt) {
@@ -30,12 +32,15 @@ public class MovingBarST extends DisplayPanelSingleThread {
 
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        g.clearRect(0, 0, getWidth(), getHeight());
         g.fillRect((int)(x), 0, 100, 3000);
     }
 
     @Override
     public void postPaint(PreciseTime dt) {
+    }
+
+    @Override
+    public void onTick(PreciseTime dt) {
     }
     
 }

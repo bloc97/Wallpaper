@@ -14,13 +14,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.swing.filechooser.FileSystemView;
 import wallpaper.PreciseTime;
-import wallpaper.Wallpaper;
+import wallpaper.CustomWallpaper;
 
 /**
  *
  * @author bowen
  */
-public class DesktopIcons extends Wallpaper {
+public class DesktopIcons extends CustomWallpaper {
 
     private final FileSystemView fs = FileSystemView.getFileSystemView();
     
@@ -28,9 +28,9 @@ public class DesktopIcons extends Wallpaper {
     
     public DesktopIcons() {
         
-        this.panel.setOpaque(false);
-        this.panel.setBackground(new Color(0, 0, 0, 0));
-        //this.setBackground(new Color(0x00000000, true));
+        this.getPanel().setOpaque(false);
+        this.getPanel().setBackground(new Color(0, 0, 0, 0));
+        
         int xc = 0;
         int yc = 0;
         
@@ -62,11 +62,10 @@ public class DesktopIcons extends Wallpaper {
 
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        g.clearRect(0, 0, panel.getWidth(), panel.getHeight());
         ((Graphics2D) g).scale(2, 2);
         
         for (DesktopIcon icon : icons) {
-            icon.painIcon(panel, g, true);
+            icon.painIcon(getPanel(), g, true);
             g.drawString(icon.getFile().getName(), icon.getX(), icon.getY() + 32 + 2);
         }
     }
