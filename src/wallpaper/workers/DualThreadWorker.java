@@ -3,27 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.workers;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import wallpaper.Wallpaper;
 
 /**
  *
  * @author bowen
  */
-public class SingleThreadWorker implements Worker {
+public class DualThreadWorker implements Worker {
     
     private final Wallpaper wallpaper;
     
+    private ScheduledFuture tickFuture;
     private ScheduledFuture updateFuture;
     private ScheduledExecutorService executorService;
+    private int targetUPS;
     private int targetFPS;
     
-    public SingleThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetFPS) {
+    public DualThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetUPS, int targetFPS) {
         this.wallpaper = wallpaper;
         this.executorService = executorService;
+        this.targetUPS = targetUPS;
         this.targetFPS = targetFPS;
     }
     
@@ -36,6 +40,10 @@ public class SingleThreadWorker implements Worker {
     public boolean setExecutorService(ScheduledExecutorService executorService) {
         this.executorService = executorService;
         boolean isSuccessful = true;
+        if (isTickRunning()) {
+            isSuccessful &= stopTick();
+            isSuccessful &= startTick();
+        }
         if (isRenderRunning()) {
             isSuccessful &= stopRender();
             isSuccessful &= startRender();
@@ -45,17 +53,26 @@ public class SingleThreadWorker implements Worker {
 
     @Override
     public boolean start() {
-        return startRender();
+        boolean isSuccessful = true;
+        isSuccessful &= startTick();
+        isSuccessful &= startRender();
+        if (!isSuccessful) {
+            stop();
+        }
+        return isSuccessful;
     }
 
     @Override
     public boolean stop() {
-        return stopRender();
+        boolean isSuccessful = true;
+        isSuccessful &= stopTick();
+        isSuccessful &= stopRender();
+        return isSuccessful;
     }
 
     @Override
     public boolean isRunning() {
-        return isRenderRunning();
+        return isRenderRunning() || isTickRunning();
     }
     
     public boolean isRenderRunning() {
@@ -70,10 +87,9 @@ public class SingleThreadWorker implements Worker {
             updateFuture = executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    wallpaper.mainTick();
                     wallpaper.paintTick();
                 }
-            }, 0, TimeUnit.SECONDS.toNanos(1)/targetFPS, TimeUnit.NANOSECONDS);
+            }, TimeUnit.SECONDS.toNanos(1)/targetUPS / 4, TimeUnit.SECONDS.toNanos(1)/targetFPS, TimeUnit.NANOSECONDS);
             return true;
         }
         return false;
@@ -89,6 +105,10 @@ public class SingleThreadWorker implements Worker {
         return false;
     }
 
+    public int getTargetFPS() {
+        return targetFPS;
+    }
+
     public boolean setTargetFPS(int fps) {
         targetFPS = fps;
         if (isRenderRunning()) {
@@ -97,10 +117,48 @@ public class SingleThreadWorker implements Worker {
         }
         return true;
     }
-
-    public int getTargetFPS() {
-        return targetFPS;
+    
+    
+    public boolean isTickRunning() {
+        if (tickFuture != null) {
+            return !tickFuture.isDone();
+        }
+        return false;
     }
     
+    public boolean startTick() {
+        if (!isTickRunning()) {
+            tickFuture = executorService.scheduleAtFixedRate(new Runnable() {
+                @Override
+                public void run() {
+                    wallpaper.mainTick();
+                }
+            }, 0, TimeUnit.SECONDS.toNanos(1)/targetUPS, TimeUnit.NANOSECONDS);
+            return true;
+        }
+        return false;
+    }
     
+    public boolean stopTick() {
+        if (tickFuture != null) {
+            if (tickFuture.cancel(true)) {
+                tickFuture = null;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getTargetUPS() {
+        return targetUPS;
+    }
+
+    public boolean setTargetUPS(int ups) {
+        targetUPS = ups;
+        if (isTickRunning()) {
+            stopTick();
+            return startTick();
+        }
+        return true;
+    }
 }

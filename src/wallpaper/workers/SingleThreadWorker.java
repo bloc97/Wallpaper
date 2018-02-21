@@ -3,30 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wallpaper;
+package wallpaper.workers;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import wallpaper.Wallpaper;
 
 /**
  *
  * @author bowen
  */
-public class DualThreadWorker implements Worker {
+public class SingleThreadWorker implements Worker {
     
     private final Wallpaper wallpaper;
     
-    private ScheduledFuture tickFuture;
     private ScheduledFuture updateFuture;
     private ScheduledExecutorService executorService;
-    private int targetUPS;
     private int targetFPS;
     
-    public DualThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetUPS, int targetFPS) {
+    public SingleThreadWorker(Wallpaper wallpaper, ScheduledExecutorService executorService, int targetFPS) {
         this.wallpaper = wallpaper;
         this.executorService = executorService;
-        this.targetUPS = targetUPS;
         this.targetFPS = targetFPS;
     }
     
@@ -39,10 +37,6 @@ public class DualThreadWorker implements Worker {
     public boolean setExecutorService(ScheduledExecutorService executorService) {
         this.executorService = executorService;
         boolean isSuccessful = true;
-        if (isTickRunning()) {
-            isSuccessful &= stopTick();
-            isSuccessful &= startTick();
-        }
         if (isRenderRunning()) {
             isSuccessful &= stopRender();
             isSuccessful &= startRender();
@@ -52,26 +46,17 @@ public class DualThreadWorker implements Worker {
 
     @Override
     public boolean start() {
-        boolean isSuccessful = true;
-        isSuccessful &= startTick();
-        isSuccessful &= startRender();
-        if (!isSuccessful) {
-            stop();
-        }
-        return isSuccessful;
+        return startRender();
     }
 
     @Override
     public boolean stop() {
-        boolean isSuccessful = true;
-        isSuccessful &= stopTick();
-        isSuccessful &= stopRender();
-        return isSuccessful;
+        return stopRender();
     }
 
     @Override
     public boolean isRunning() {
-        return isRenderRunning() || isTickRunning();
+        return isRenderRunning();
     }
     
     public boolean isRenderRunning() {
@@ -86,9 +71,10 @@ public class DualThreadWorker implements Worker {
             updateFuture = executorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
+                    wallpaper.mainTick();
                     wallpaper.paintTick();
                 }
-            }, TimeUnit.SECONDS.toNanos(1)/targetUPS / 4, TimeUnit.SECONDS.toNanos(1)/targetFPS, TimeUnit.NANOSECONDS);
+            }, 0, TimeUnit.SECONDS.toNanos(1)/targetFPS, TimeUnit.NANOSECONDS);
             return true;
         }
         return false;
@@ -104,10 +90,6 @@ public class DualThreadWorker implements Worker {
         return false;
     }
 
-    public int getTargetFPS() {
-        return targetFPS;
-    }
-
     public boolean setTargetFPS(int fps) {
         targetFPS = fps;
         if (isRenderRunning()) {
@@ -116,48 +98,10 @@ public class DualThreadWorker implements Worker {
         }
         return true;
     }
-    
-    
-    public boolean isTickRunning() {
-        if (tickFuture != null) {
-            return !tickFuture.isDone();
-        }
-        return false;
-    }
-    
-    public boolean startTick() {
-        if (!isTickRunning()) {
-            tickFuture = executorService.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    wallpaper.mainTick();
-                }
-            }, 0, TimeUnit.SECONDS.toNanos(1)/targetUPS, TimeUnit.NANOSECONDS);
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean stopTick() {
-        if (tickFuture != null) {
-            if (tickFuture.cancel(true)) {
-                tickFuture = null;
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public int getTargetUPS() {
-        return targetUPS;
+    public int getTargetFPS() {
+        return targetFPS;
     }
-
-    public boolean setTargetUPS(int ups) {
-        targetUPS = ups;
-        if (isTickRunning()) {
-            stopTick();
-            return startTick();
-        }
-        return true;
-    }
+    
+    
 }
