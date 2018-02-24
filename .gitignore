@@ -23,3 +23,5 @@ hs_err_pid*
 /build/
 /dist/
 *.mp4
+*.avi
+*.dll

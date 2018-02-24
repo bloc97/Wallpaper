@@ -23,24 +23,9 @@ public class MovingBar extends CustomWallpaper {
         getComponent().setBackground(Color.WHITE);
     }
     
-    
-    @Override
-    public void prePaint(PreciseTime dt) {
-        x += dt.getNanos() / 300000d;
-        x %= 4000;
-    }
-
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
         g.fillRect((int)(x), 0, 100, 3000);
-    }
-
-    @Override
-    public void postPaint(PreciseTime dt) {
-    }
-
-    @Override
-    public void onTick(PreciseTime dt) {
     }
     
 }

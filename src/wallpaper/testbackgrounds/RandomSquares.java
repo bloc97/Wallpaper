@@ -9,31 +9,23 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.util.concurrent.ScheduledExecutorService;
-import wallpaper.DisplayPanelSingleThread;
+import wallpaper.CustomWallpaper;
 import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class RandomSquares extends DisplayPanelSingleThread {
+public class RandomSquares extends CustomWallpaper {
 
-
-    public RandomSquares(ScheduledExecutorService executorService, int fps) {
-        super(executorService, fps);
-    }
     
     @Override
-    public void prePaint(PreciseTime dt) {
-    }
-
-    @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        g.clearRect(0, 0, getWidth(), getHeight());
+        g.clearRect(0, 0, getPanel().getWidth(), getPanel().getHeight());
         //g.drawRect(5, 5, 100, 100);
         //g.setColor(Color.BLACK);
-        for (int i=0; i<getWidth(); i+=10) {
-            for (int j=0; j<getHeight(); j+=10) {
+        for (int i=0; i<getPanel().getWidth(); i+=10) {
+            for (int j=0; j<getPanel().getHeight(); j+=10) {
                 if (Math.random() < 0.5d) {
                     g.fillRect(i, j, 10, 10);
                     //g.setColor(Color.WHITE);
@@ -43,10 +35,6 @@ public class RandomSquares extends DisplayPanelSingleThread {
                 }
             }
         }
-    }
-
-    @Override
-    public void postPaint(PreciseTime dt) {
     }
     
 }

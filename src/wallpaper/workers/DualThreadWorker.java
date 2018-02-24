@@ -14,7 +14,7 @@ import wallpaper.CustomWallpaper;
  *
  * @author bowen
  */
-public class DualThreadWorker implements Worker {
+public class DualThreadWorker implements ThreadWorker {
     
     private final CustomWallpaper wallpaper;
     

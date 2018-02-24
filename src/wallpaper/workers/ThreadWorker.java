@@ -11,8 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
  *
  * @author bowen
  */
-public interface Worker {
-    public boolean start();
-    public boolean stop();
-    public boolean isRunning();
+public interface ThreadWorker extends Worker {
+    public ScheduledExecutorService getExecutorService();
+    public boolean setExecutorService(ScheduledExecutorService executorService);
 }

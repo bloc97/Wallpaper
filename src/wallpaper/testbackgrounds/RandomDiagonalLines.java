@@ -9,14 +9,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
-import wallpaper.DisplayPanelSingleThread;
+import wallpaper.CustomWallpaper;
 import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class RandomDiagonalLines extends DisplayPanelSingleThread {
+public class RandomDiagonalLines extends CustomWallpaper {
     private int xSize = 192;
     private int ySize = 108 - 3;
     private int[][] board = new int[xSize][ySize];
@@ -24,10 +24,6 @@ public class RandomDiagonalLines extends DisplayPanelSingleThread {
     private boolean[][] activeBoard = new boolean[xSize][ySize];
     
     private Random random = new Random(245);
-    
-    public RandomDiagonalLines(ScheduledExecutorService executorService, int fps) {
-        super(executorService, fps);
-    }
     
     
     @Override
@@ -95,9 +91,5 @@ public class RandomDiagonalLines extends DisplayPanelSingleThread {
                 g.fillRect(i * 20, j * 20, 20, 20);
             }
         }
-    }
-
-    @Override
-    public void postPaint(PreciseTime dt) {
     }
 }

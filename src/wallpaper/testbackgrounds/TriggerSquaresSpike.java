@@ -7,17 +7,15 @@ package wallpaper.testbackgrounds;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Toolkit;
 import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
-import wallpaper.DisplayPanelSingleThread;
+import wallpaper.CustomWallpaper;
 import wallpaper.PreciseTime;
 
 /**
  *
  * @author bowen
  */
-public class TriggerSquaresSpike extends DisplayPanelSingleThread {
+public class TriggerSquaresSpike extends CustomWallpaper {
     private int xSize = 300;
     private int ySize = 120;
     private int[][] board = new int[xSize][ySize];
@@ -25,10 +23,6 @@ public class TriggerSquaresSpike extends DisplayPanelSingleThread {
     private boolean[][] activeBoard = new boolean[xSize][ySize];
     
     private Random random = new Random(245);
-    
-    public TriggerSquaresSpike(ScheduledExecutorService executorService, int fps) {
-        super(executorService, fps);
-    }
     
     @Override
     public void prePaint(PreciseTime dt) {
@@ -111,7 +105,7 @@ public class TriggerSquaresSpike extends DisplayPanelSingleThread {
 
     @Override
     public void onPaint(Graphics g, PreciseTime dt) {
-        g.clearRect(0, 0, getWidth(), getHeight());
+        g.clearRect(0, 0, getPanel().getWidth(), getPanel().getHeight());
         //g.drawRect(5, 5, 100, 100);
         //g.setColor(Color.BLACK);
         for (int i=0; i<xSize; i++) {

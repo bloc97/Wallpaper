@@ -17,31 +17,31 @@ import wallpaper.icons.DesktopIcons;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import wallpaper.testbackgrounds.MovingBar;
+import wallpaper.workers.VideoWorker;
 
 public class Main {
     
         
     public static void main(String[] args) {
-        
         Background background = new Background("Bloc Active Wallpaper", false);
         
+        boolean flip = true;
         
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(8);
+        if (flip) {
         
-        //CustomWallpaper icons = new DesktopIcons();
-        //Worker worker = new SingleThreadWorker(icons, executor, 60);
+            ImageWallpaper animatedBackground = new ImageWallpaper();
+            VideoWorker worker = new VideoWorker("01 - La planete Omega.avi", animatedBackground);
+            background.setBackground(animatedBackground);
+            worker.start();
         
-        CustomWallpaper movingBar = new MovingBar();
-        Worker wallpaperWorker = new SingleThreadWorker(movingBar, executor, 30);
+        } else {
+
+            CustomVideoWallpaperMerge video = new CustomVideoWallpaperMerge("01 - La planete Omega.avi");
+            background.setBackground(video);
+            video.start();
         
-        VideoWallpaper video = new VideoWallpaper("https://youtu.be/xisVS_DKpJg?t=2h58m49s");
+        }
         
-        background.setBackground(video);
-        background.setForeground(movingBar);
-        
-        //worker.start();
-        wallpaperWorker.start();
-        video.start();
         
     }
 }

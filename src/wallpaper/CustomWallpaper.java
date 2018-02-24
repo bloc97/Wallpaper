@@ -18,41 +18,80 @@ public abstract class CustomWallpaper implements Wallpaper {
     
     private volatile long lastTickTimeNanos;
     private PreciseTime currentdt;
+    
+    private CustomWallpaper overlay;
 
     private JPanel panel = new JPanel(true) {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            onPaint(g, currentdt);
+            internalPaint(g, currentdt);
         }
     };
     
-    public void mainTick() {
+    public final void mainTick() {
         long currentNanos = System.nanoTime();
         PreciseTime dt = new PreciseTime(currentNanos - lastTickTimeNanos, TimeUnit.NANOSECONDS);
         currentdt = dt;
         lastTickTimeNanos = currentNanos;
-        onTick(currentdt);
+        internalTick(currentdt);
     }
     
-    public void paintTick() {
-        prePaint(currentdt);
+    public final void paintTick() {
+        internalPrePaint(currentdt);
         panel.repaint();
-        postPaint(currentdt);
+        internalPostPaint(currentdt);
     }
     
-    public abstract void onTick(PreciseTime dt); //Dt is time since last tick, if Singlethreaded, tick runs before prePaint
+    private void internalTick(PreciseTime dt) {
+        onTick(dt);
+        if (overlay != null) {
+            overlay.onTick(dt);
+        }
+    }
     
-    public abstract void prePaint(PreciseTime dt);
+    private void internalPrePaint(PreciseTime dt) {
+        prePaint(dt);
+        if (overlay != null) {
+            overlay.internalPrePaint(dt);
+        }
+    }
+    private void internalPaint(Graphics g, PreciseTime dt) {
+        onPaint(g.create(), dt);
+        if (overlay != null) {
+            overlay.internalPaint(g, dt);
+        }
+    }
+    private void internalPostPaint(PreciseTime dt) {
+        postPaint(dt);
+        if (overlay != null) {
+            overlay.internalPostPaint(dt);
+        }
+    }
+    
+    public void onTick(PreciseTime dt) { //Dt is time since last tick, if Singlethreaded, tick runs before prePaint
+    }
+    
+    public void prePaint(PreciseTime dt) {
+    }
     public abstract void onPaint(Graphics g, PreciseTime dt); //Dt is time since last tick
-    public abstract void postPaint(PreciseTime dt);
+    public void postPaint(PreciseTime dt) {
+    }
     
     @Override
-    public Component getComponent() {
+    public final Component getComponent() {
         return panel;
     }
     
-    public JPanel getPanel() {
+    public final JPanel getPanel() {
         return panel;
+    }
+    
+    public final boolean setOverlay(CustomWallpaper overlay) {
+        if (!this.equals(overlay)) {
+            this.overlay = overlay;
+            return true;
+        }
+        return false;
     }
 }
